@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PaceIQ — Training Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1f1f1f;
+      --border: #2a2a2a;
+      --orange: #ff5c00;
+      --orange-dim: #ff5c0022;
+      --orange-mid: #ff5c0055;
+      --text: #f0ede8;
+      --muted: #666;
+      --green: #3ddc84;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,13,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo span { color: var(--orange); }
+
+    .nav-back {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--orange); }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 40px 80px;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .page-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+
+    .page-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      text-transform: uppercase;
+      line-height: 0.95;
+    }
+
+    .plan-meta {
+      text-align: right;
+    }
+
+    .plan-version {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 2.5rem;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .plan-version-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* SUMMARY ROW */
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      padding: 20px 24px;
+    }
+
+    .summary-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--text);
+    }
+
+    .summary-value.orange { color: var(--orange); }
+
+    /* ADVICE BANNER */
+    .advice-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--orange);
+      padding: 20px 24px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    .advice-label {
+      font-size: 0.7rem;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 8px;
+    }
+
+    .advice-text {
+      font-size: 0.88rem;
+      color: #b0ada8;
+      line-height: 1.7;
+    }
+
+    /* WEEK FILTER */
+    .week-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .filter-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: 'DM Mono', monospace;
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 6px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn.active {
+      background: var(--orange-dim);
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    /* WEEKS LIST */
+    .weeks-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeUp 0.5s 0.25s ease both;
+    }
+
+    .week-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .week-card:hover { border-color: #3a3a3a; }
+
+    .week-card.current { border-color: var(--orange-mid); }
+
+    .week-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .week-header:hover { background: var(--surface2); }
+
+    .week-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--muted);
+      line-height: 1;
+      min-width: 48px;
+    }
+
+    .week-number.current-num { color: var(--orange); }
+
+    .week-focus-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .week-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .week-badge.current-badge {
+      border-color: var(--orange-mid);
+      color: var(--orange);
+      background: var(--orange-dim);
+    }
+
+    .week-total {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .chevron {
+      color: var(--muted);
+      transition: transform 0.3s;
+      font-size: 0.8rem;
+    }
+
+    .week-card.open .chevron { transform: rotate(180deg); }
+
+    /* RUNS TABLE */
+    .runs-table {
+      display: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .week-card.open .runs-table { display: block; }
+
+    .run-row {
+      display: grid;
+      grid-template-columns: 90px 140px 1fr 80px;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .run-row:last-child { border-bottom: none; }
+    .run-row:hover { background: var(--surface2); }
+
+    .run-row-day {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .run-row-type {
+      font-weight: 500;
+      font-size: 0.88rem;
+    }
+
+    .type-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-family: 'DM Mono', monospace;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .type-badge.long { border-color: #ff5c0044; color: var(--orange); }
+    .type-badge.tempo { border-color: #3ddc8444; color: var(--green); }
+    .type-badge.intervals { border-color: #4488ff44; color: #4488ff; }
+    .type-badge.easy { border-color: var(--border); color: var(--muted); }
+
+    .run-row-notes {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .run-row-dist {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--orange);
+      text-align: right;
+    }
+
+    /* LOADING */
+    .loading-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--border);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    /* REGENERATE BUTTON */
+    .regen-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 10px 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .regen-btn:hover {
+      border-color: var(--orange-mid);
+      color: var(--orange);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      main { padding: 32px 20px 60px; }
+      nav { padding: 16px 20px; }
+      .summary-row { grid-template-columns: 1fr; }
+      .run-row { grid-template-columns: 70px 1fr 60px; }
+      .run-row-notes { display: none; }
+      .page-header { grid-template-columns: 1fr; gap: 16px; }
+      .plan-meta { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Pace<span>IQ</span></a>
+  <a class="nav-back" href="index.html">← Dashboard</a>
+</nav>
+
+<main>
+
+  <!-- LOADING STATE -->
+  <div class="loading-state" id="loading-state">
+    <div class="spinner"></div>
+    Fetching your training plan...
+  </div>
+
+  <!-- CONTENT (hidden until loaded) -->
+  <div id="content" style="display:none">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="page-label">AI Generated</div>
+        <div class="page-title">Training<br>Plan</div>
+      </div>
+      <div class="plan-meta">
+        <div class="plan-version" id="plan-version-display">v1</div>
+        <div class="plan-version-label">Current version</div>
+        <button class="regen-btn" style="margin-top:12px" onclick="regeneratePlan()">↺ Regenerate</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-row">
+      <div class="summary-card">
+        <div class="summary-label">Predicted Finish</div>
+        <div class="summary-value orange" id="predicted-finish">--:--</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Total Weeks</div>
+        <div class="summary-value" id="total-weeks">--</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Generated</div>
+        <div class="summary-value" style="font-size:1rem;padding-top:4px" id="generated-at">--</div>
+      </div>
+    </div>
+
+    <!-- ADVICE -->
+    <div class="advice-banner" id="advice-banner" style="display:none">
+      <div class="advice-label">Coach Advice</div>
+      <div class="advice-text" id="advice-text"></div>
+    </div>
+
+    <!-- WEEK FILTER -->
+    <div class="week-filter">
+      <span class="filter-label">Jump to:</span>
+      <button class="filter-btn active" onclick="filterWeeks('all', this)">All Weeks</button>
+      <button class="filter-btn" onclick="filterWeeks('current', this)">Current Week</button>
+      <button class="filter-btn" onclick="filterWeeks('upcoming', this)">Upcoming</button>
+    </div>
+
+    <!-- WEEKS -->
+    <div class="weeks-container" id="weeks-container"></div>
+
+  </div>
+
+</main>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+  const USER_ID = localStorage.getItem('user_id') || 1;
+  let planData = null;
+  let currentWeekIndex = 0;
+
+  function getRunTypeBadge(type) {
+    const t = type.toLowerCase();
+    if (t.includes('long')) return 'long';
+    if (t.includes('tempo')) return 'tempo';
+    if (t.includes('interval') || t.includes('repeat') || t.includes('hill')) return 'intervals';
+    return 'easy';
+  }
+
+  function toggleWeek(weekNum) {
+    const card = document.getElementById(`week-card-${weekNum}`);
+    card.classList.toggle('open');
+  }
+
+  function filterWeeks(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const cards = document.querySelectorAll('.week-card');
+    cards.forEach((card, i) => {
+      if (type === 'all') {
+        card.style.display = 'block';
+      } else if (type === 'current') {
+        card.style.display = i === currentWeekIndex ? 'block' : 'none';
+      } else if (type === 'upcoming') {
+        card.style.display = i >= currentWeekIndex ? 'block' : 'none';
+      }
+    });
+  }
+
+  function estimateCurrentWeek(plan, generatedAt) {
+    const generated = new Date(generatedAt);
+    const now = new Date();
+    const weeksPassed = Math.floor((now - generated) / (1000 * 60 * 60 * 24 * 7));
+    return Math.min(weeksPassed, plan.weeks.length - 1);
+  }
+
+  function renderPlan(data) {
+    planData = data;
+    const plan = data.plan;
+
+    document.getElementById('plan-version-display').textContent = `v${data.version}`;
+    document.getElementById('predicted-finish').textContent = plan.predicted_finish_time || '--:--';
+    document.getElementById('total-weeks').textContent = plan.weeks?.length || '--';
+
+    const genDate = new Date(data.generated_at);
+    document.getElementById('generated-at').textContent = genDate.toLocaleDateString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
+
+    if (plan.advice) {
+      document.getElementById('advice-banner').style.display = 'block';
+      document.getElementById('advice-text').textContent = plan.advice;
+    }
+
+    currentWeekIndex = estimateCurrentWeek(plan, data.generated_at);
+
+    const container = document.getElementById('weeks-container');
+    container.innerHTML = plan.weeks.map((week, i) => {
+      const isCurrent = i === currentWeekIndex;
+      const totalKm = week.runs.reduce((sum, r) => sum + (r.distance_km || 0), 0).toFixed(1);
+
+      const runsHTML = week.runs.map(run => {
+        const badgeClass = getRunTypeBadge(run.type);
+        return `
+          <div class="run-row">
+            <div class="run-row-day">${run.day}</div>
+            <div>
+              <span class="type-badge ${badgeClass}">${run.type}</span>
+            </div>
+            <div class="run-row-notes">${run.notes || ''}</div>
+            <div class="run-row-dist">${run.distance_km}km</div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="week-card ${isCurrent ? 'current open' : ''}" id="week-card-${week.week_number}">
+          <div class="week-header" onclick="toggleWeek(${week.week_number})">
+            <div class="week-number ${isCurrent ? 'current-num' : ''}">W${week.week_number}</div>
+            <div class="week-focus-text">${week.focus}</div>
+            <div class="week-badge ${isCurrent ? 'current-badge' : ''}">${isCurrent ? 'Current Week' : `Week ${week.week_number}`}</div>
+            <div class="week-total">${totalKm}km</div>
+            <div class="chevron">▼</div>
+          </div>
+          <div class="runs-table">
+            ${runsHTML}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function loadPlan() {
+    try {
+      const res = await fetch(`${API}/plan/${USER_ID}`);
+      if (!res.ok) throw new Error('No plan');
+      const data = await res.json();
+
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      renderPlan(data);
+    } catch (e) {
+      document.getElementById('loading-state').innerHTML =
+        '<div style="color:var(--muted);font-family:DM Mono,monospace;font-size:0.8rem">No plan found. <a href="onboarding.html" style="color:var(--orange)">Generate one →</a></div>';
+    }
+  }
+
+  async function regeneratePlan() {
+    if (!confirm('Regenerate your training plan? This will create a new version.')) return;
+    const btn = document.querySelector('.regen-btn');
+    btn.textContent = 'Generating...';
+    btn.disabled = true;
+
+    try {
+      await fetch(`${API}/plan/${USER_ID}`, { method: 'POST' });
+      await loadPlan();
+    } catch (e) {
+      alert('Failed to regenerate plan.');
+    }
+
+    btn.textContent = '↺ Regenerate';
+    btn.disabled = false;
+  }
+
+  loadPlan();
+</script>
+
+</body>
+</html>

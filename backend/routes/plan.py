@@ -41,7 +41,13 @@ def create_plan(user_id: int, db: Session = Depends(get_db)):
         ],
     }
 
-    plan_text = generate_training_plan(user_data)
+    try:
+        plan_text = generate_training_plan(user_data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    if not plan_text:
+        raise HTTPException(status_code=500, detail="Gemini returned empty response.")
 
     # clean up markdown code blocks if Gemini returns them
     clean_plan = (

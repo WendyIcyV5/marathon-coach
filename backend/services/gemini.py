@@ -15,6 +15,7 @@ client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 def generate_training_plan(user_data: dict) -> str:
+    print("generate_training_plan called with:", user_data)
     prompt = f"""
     You are an expert marathon coach. Generate a detailed week-by-week {user_data['race_type']} training plan in JSON format.
 
@@ -48,6 +49,18 @@ def generate_training_plan(user_data: dict) -> str:
 
     Only return the JSON, no extra text.
     """
+
+    try:
+        response = client.models.generate_content(
+            model="models/gemini-2.5-flash",
+            contents=prompt
+        )
+        print("Gemini response:", response)
+        print("Gemini text:", response.text)
+        return response.text
+    except Exception as e:
+        print("Gemini error:", str(e))
+        raise e
 
 
 def analyze_run_and_adapt_plan(
@@ -84,6 +97,8 @@ def analyze_run_and_adapt_plan(
     Only return the JSON, no extra text.
     """
     response = client.models.generate_content(
-        model="gemini-3-flash-preview", contents=prompt
+        model="models/gemini-2.5-flash", contents=prompt
     )
+    print("Gemini response:", response)
+    print("Gemini text:", response.text)
     return response.text

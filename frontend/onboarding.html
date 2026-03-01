@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PaceIQ — Get Started</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1f1f1f;
+      --border: #2a2a2a;
+      --orange: #ff5c00;
+      --orange-dim: #ff5c0022;
+      --orange-mid: #ff5c0055;
+      --text: #f0ede8;
+      --muted: #666;
+      --green: #3ddc84;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo span { color: var(--orange); }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 40px 80px;
+    }
+
+    .page-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+    }
+
+    .page-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      text-transform: uppercase;
+      line-height: 0.95;
+      margin-bottom: 12px;
+    }
+
+    .page-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 48px;
+      line-height: 1.6;
+    }
+
+    /* STEPS */
+    .step {
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .step.active { display: block; }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .step-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 0.8rem;
+      color: var(--orange);
+      background: var(--orange-dim);
+      border: 1px solid var(--orange-mid);
+      padding: 4px 10px;
+      letter-spacing: 0.1em;
+    }
+
+    .step-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* FORM ELEMENTS */
+    .field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 8px;
+    }
+
+    input, select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--orange);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
+    select option {
+      background: var(--surface2);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* AVAILABILITY PICKER */
+    .days-picker {
+      display: flex;
+      gap: 8px;
+    }
+
+    .day-btn {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 12px 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .day-btn.selected {
+      background: var(--orange-dim);
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    /* PAST RACES */
+    .race-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .race-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .race-item input {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+
+    .remove-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.15s;
+    }
+
+    .remove-btn:hover {
+      border-color: #ff4545;
+      color: #ff4545;
+    }
+
+    .add-race-btn {
+      background: none;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      padding: 12px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .add-race-btn:hover {
+      border-color: var(--orange-mid);
+      color: var(--orange);
+    }
+
+    .no-races-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* NAVIGATION BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 36px;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: #000;
+      border: none;
+      padding: 16px 32px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      flex: 1;
+    }
+
+    .btn-primary:hover { background: #ff7a2a; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled {
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-secondary:hover { background: var(--surface2); }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 40px;
+    }
+
+    .progress-seg {
+      height: 3px;
+      flex: 1;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+
+    .progress-seg.done { background: var(--orange); }
+
+    /* SUCCESS STATE */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .success-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .success-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .success-title span { color: var(--orange); }
+
+    .success-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+
+    /* LOADING OVERLAY */
+    .loading-overlay {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    .loading-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      main { padding: 32px 20px 60px; }
+      nav { padding: 16px 20px; }
+      .field-row { grid-template-columns: 1fr; }
+      .race-item { grid-template-columns: 1fr 1fr; }
+      .race-item input:last-of-type { grid-column: span 2; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Pace<span>IQ</span></a>
+</nav>
+
+<main>
+  <div class="page-label">Setup</div>
+  <div class="page-title">Let's build<br>your plan</div>
+  <div class="page-sub">Tell us about yourself and we'll generate a personalized training plan powered by AI.</div>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="progress-seg done" id="seg-1"></div>
+    <div class="progress-seg" id="seg-2"></div>
+    <div class="progress-seg" id="seg-3"></div>
+  </div>
+
+  <!-- STEP 1: Basic Info -->
+  <div class="step active" id="step-1">
+    <div class="step-header">
+      <div class="step-number">01 / 03</div>
+      <div class="step-title">Basic Info</div>
+    </div>
+
+    <div class="field">
+      <label>Your Name</label>
+      <input type="text" id="name" placeholder="e.g. Wendy" />
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Race Type</label>
+        <select id="race-type">
+          <option value="half_marathon">Half Marathon (21.1km)</option>
+          <option value="marathon">Full Marathon (42.2km)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Race Date</label>
+        <input type="date" id="marathon-date" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Goal Finish Time (optional)</label>
+      <input type="text" id="goal-time" placeholder="e.g. 2:00:00" />
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goToStep(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Availability -->
+  <div class="step" id="step-2">
+    <div class="step-header">
+      <div class="step-number">02 / 03</div>
+      <div class="step-title">Training Availability</div>
+    </div>
+
+    <div class="field">
+      <label>How many days per week can you train?</label>
+      <div class="days-picker">
+        <button class="day-btn" onclick="selectDays(this, 2)">2</button>
+        <button class="day-btn" onclick="selectDays(this, 3)">3</button>
+        <button class="day-btn selected" onclick="selectDays(this, 4)">4</button>
+        <button class="day-btn" onclick="selectDays(this, 5)">5</button>
+        <button class="day-btn" onclick="selectDays(this, 6)">6</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goToStep(1)">← Back</button>
+      <button class="btn-primary" onclick="goToStep(3)">Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Past Races -->
+  <div class="step" id="step-3">
+    <div class="step-header">
+      <div class="step-number">03 / 03</div>
+      <div class="step-title">Past Race History</div>
+    </div>
+
+    <div class="race-list" id="race-list"></div>
+
+    <button class="add-race-btn" onclick="addRace()">+ Add a past race</button>
+    <div class="no-races-note">No past races? That's fine — skip this step.</div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goToStep(2)">← Back</button>
+      <button class="btn-primary" id="submit-btn" onclick="submitOnboarding()">Generate My Plan →</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Generating your personalized plan...</div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-state" id="success">
+    <div class="success-icon">🏃</div>
+    <div class="success-title">Plan <span>Ready</span></div>
+    <div class="success-sub">Your AI training plan has been generated. Time to get moving.</div>
+    <button class="btn-primary" style="max-width:280px;margin:0 auto" onclick="window.location.href='index.html'">
+      Go to Dashboard →
+    </button>
+  </div>
+
+</main>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+  let selectedDays = 4;
+  let raceCount = 0;
+
+  function goToStep(num) {
+    // Validate step 1 before proceeding
+    if (num === 2) {
+      const name = document.getElementById('name').value.trim();
+      const date = document.getElementById('marathon-date').value;
+      if (!name) { alert('Please enter your name.'); return; }
+      if (!date) { alert('Please select your race date.'); return; }
+    }
+
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(`step-${num}`).classList.add('active');
+
+    // Update progress bar
+    for (let i = 1; i <= 3; i++) {
+      const seg = document.getElementById(`seg-${i}`);
+      seg.classList.toggle('done', i <= num);
+    }
+  }
+
+  function selectDays(btn, days) {
+    selectedDays = days;
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function addRace() {
+    raceCount++;
+    const list = document.getElementById('race-list');
+    const div = document.createElement('div');
+    div.className = 'race-item';
+    div.id = `race-${raceCount}`;
+    div.innerHTML = `
+      <div class="field" style="margin:0">
+        <label>Distance (km)</label>
+        <input type="number" placeholder="21.1" step="0.1" class="race-distance" />
+      </div>
+      <div class="field" style="margin:0">
+        <label>Finish Time</label>
+        <input type="text" placeholder="2:15:00" class="race-time" />
+      </div>
+      <div class="field" style="margin:0">
+        <label>Race Date</label>
+        <input type="date" class="race-date" />
+      </div>
+      <button class="remove-btn" onclick="removeRace(${raceCount})">✕</button>
+    `;
+    list.appendChild(div);
+  }
+
+  function removeRace(id) {
+    document.getElementById(`race-${id}`)?.remove();
+  }
+
+  async function submitOnboarding() {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+
+    // Hide step, show loading
+    document.getElementById('step-3').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+
+    // Collect past races
+    const pastRaces = [];
+    document.querySelectorAll('.race-item').forEach(item => {
+      const dist = item.querySelector('.race-distance').value;
+      const time = item.querySelector('.race-time').value;
+      const date = item.querySelector('.race-date').value;
+      if (dist && time) {
+        pastRaces.push({
+          distance_km: parseFloat(dist),
+          finish_time: time,
+          race_date: date || null
+        });
+      }
+    });
+
+    const payload = {
+      name: document.getElementById('name').value.trim(),
+      marathon_date: document.getElementById('marathon-date').value,
+      goal_time: document.getElementById('goal-time').value || null,
+      weekly_availability: selectedDays,
+      race_type: document.getElementById('race-type').value,
+      past_races: pastRaces
+    };
+
+    try {
+      // Create user
+      const userRes = await fetch(`${API}/user/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const userData = await userRes.json();
+      const userId = userData.user_id;
+
+      // Save user ID
+      localStorage.setItem('user_id', userId);
+
+      // Generate plan
+      await fetch(`${API}/plan/${userId}`, { method: 'POST' });
+
+      // Show success
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+
+    } catch (e) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('step-3').style.display = 'block';
+      btn.disabled = false;
+      alert('Something went wrong. Please try again.');
+    }
+  }
+</script>
+
+</body>
+</html>
