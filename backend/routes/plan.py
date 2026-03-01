@@ -11,6 +11,19 @@ from database import get_db
 import models
 import json
 from services.gemini import generate_training_plan
+import re
+
+def extract_json(text: str) -> str:
+    # Remove markdown code blocks
+    text = text.strip()
+    text = re.sub(r'^```json\s*', '', text)
+    text = re.sub(r'^```\s*', '', text)
+    text = re.sub(r'\s*```$', '', text)
+    # Extract just the JSON object
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    if match:
+        return match.group(0)
+    return text
 
 router = APIRouter(prefix="/plan", tags=["Plan"])
 
@@ -50,13 +63,7 @@ def create_plan(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Gemini returned empty response.")
 
     # clean up markdown code blocks if Gemini returns them
-    clean_plan = (
-        plan_text.strip()
-        .removeprefix("```json")
-        .removeprefix("```")
-        .removesuffix("```")
-        .strip()
-    )
+    clean_plan = extract_json(plan_text)
 
     latest_plan = (
         db.query(models.TrainingPlan)

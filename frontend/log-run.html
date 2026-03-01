@@ -558,8 +558,8 @@
     <!-- BUTTONS -->
     <div class="submit-section">
       <div class="btn-row">
-        <button class="btn-primary" onclick="logAndAnalyze()">Log + Get Feedback</button>
-        <button class="btn-analyze" onclick="logOnly()">Just Log It</button>
+        <button class="btn-analyze" onclick="logOnly()">Log my run</button>
+        <a class="btn-analyze" href="index.html">← Dashboard</a>
       </div>
     </div>
   </div>
@@ -715,42 +715,6 @@
     }
   }
 
-  async function logAndAnalyze() {
-    showLoading('Saving your run...');
-    try {
-      await logRun();
-
-      document.getElementById('loading-text').textContent = 'Your coach is analyzing your training...';
-
-      const analyzeRes = await fetch(`${API}/coach/analyze/${USER_ID}`, { method: 'POST' });
-      const analysis = await analyzeRes.json();
-
-      hideLoading();
-      document.getElementById('feedback-state').style.display = 'block';
-      document.getElementById('feedback-body').textContent = analysis.feedback;
-
-      if (analysis.plan_changed) {
-        document.getElementById('plan-changed-notice').style.display = 'block';
-      }
-
-      // Auto-fetch voice briefing
-      try {
-        const voiceRes = await fetch(`${API}/coach/voice/${USER_ID}`);
-        const blob = await voiceRes.blob();
-        const url = URL.createObjectURL(blob);
-        const container = document.getElementById('audio-container');
-        const player = document.getElementById('audio-player');
-        player.src = url;
-        container.style.display = 'block';
-        player.play();
-      } catch (e) {}
-
-    } catch (e) {
-      hideLoading();
-      document.getElementById('form-view').style.display = 'block';
-      alert('Something went wrong. Please try again.');
-    }
-  }
 
   loadTodaysRun();
 </script>

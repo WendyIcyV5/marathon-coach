@@ -565,11 +565,10 @@
 
 <script>
   const API = 'http://127.0.0.1:8000';
-  const USER_ID = localStorage.getItem('user_id') || 1; // default to 1 for now
+  const USER_ID = localStorage.getItem('user_id') || 1;
 
   async function loadDashboard() {
     try {
-      // Load user
       const userRes = await fetch(`${API}/user/${USER_ID}`);
       const user = await userRes.json();
 
@@ -579,7 +578,6 @@
         user.race_type === 'half_marathon' ? 'Half Marathon' : 'Full Marathon';
       document.getElementById('goal-time').textContent = user.goal_time || 'Not set';
 
-      // Days to race
       const raceDate = new Date(user.marathon_date);
       const today = new Date();
       const days = Math.ceil((raceDate - today) / (1000 * 60 * 60 * 24));
@@ -589,21 +587,43 @@
       document.getElementById('hero-name').textContent = 'Runner';
     }
 
-    // Load plan
+    // Load runs
+    try {
+      const runsRes = await fetch(`${API}/runs/${USER_ID}`);
+      const runsData = await runsRes.json();
+      document.getElementById('total-runs').textContent = runsData.total_runs || 0;
+
+      const latestRun = runsData.runs?.[0];
+      if (latestRun?.gemini_feedback) {
+        document.getElementById('feedback-card').style.display = 'block';
+        document.getElementById('feedback-text').textContent = latestRun.gemini_feedback;
+      }
+    } catch (e) {}
+
+    // Load reminder
+    try {
+      const remRes = await fetch(`${API}/coach/reminder/${USER_ID}`);
+      const rem = await remRes.json();
+      document.getElementById('reminder-text').textContent = rem.message;
+      if (rem.reminder) {
+        document.getElementById('status-dot').classList.add('warn');
+      }
+    } catch (e) {}
+  }
+
+  async function loadPlan(retries = 3) {
     try {
       const planRes = await fetch(`${API}/plan/${USER_ID}`);
+      if (!planRes.ok) throw new Error('No plan');
       const data = await planRes.json();
       const plan = data.plan;
 
       document.getElementById('plan-version').textContent = `v${data.version}`;
-      document.getElementById('predicted-time').textContent =
-        plan.predicted_finish_time || '--:--';
+      document.getElementById('predicted-time').textContent = plan.predicted_finish_time || '--:--';
 
-      // Show first week
       const firstWeek = plan.weeks?.[0];
       if (firstWeek) {
         document.getElementById('week-focus').textContent = firstWeek.focus;
-        const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
         const todayName = new Date().toLocaleDateString('en-US', {weekday:'short'});
 
         document.getElementById('runs-list').innerHTML = firstWeek.runs.map(run => {
@@ -624,33 +644,13 @@
         }).join('');
       }
     } catch (e) {
-      document.getElementById('runs-list').innerHTML =
-        '<div class="loading">No plan yet. <a href="onboarding.html" style="color:var(--orange)">Generate one →</a></div>';
+      if (retries > 0) {
+        setTimeout(() => loadPlan(retries - 1), 3000);
+      } else {
+        document.getElementById('runs-list').innerHTML =
+          '<div class="loading">No plan yet. <a href="onboarding.html" style="color:var(--orange)">Generate one →</a></div>';
+      }
     }
-
-    // Load runs
-    try {
-      const runsRes = await fetch(`${API}/runs/${USER_ID}`);
-      const runsData = await runsRes.json();
-      document.getElementById('total-runs').textContent = runsData.total_runs || 0;
-
-      // Show latest feedback if exists
-      const latestRun = runsData.runs?.[0];
-      if (latestRun?.gemini_feedback) {
-        document.getElementById('feedback-card').style.display = 'block';
-        document.getElementById('feedback-text').textContent = latestRun.gemini_feedback;
-      }
-    } catch (e) {}
-
-    // Load reminder
-    try {
-      const remRes = await fetch(`${API}/coach/reminder/${USER_ID}`);
-      const rem = await remRes.json();
-      document.getElementById('reminder-text').textContent = rem.message;
-      if (rem.reminder) {
-        document.getElementById('status-dot').classList.add('warn');
-      }
-    } catch (e) {}
   }
 
   async function getVoiceBriefing() {
@@ -667,16 +667,26 @@
       const player = document.getElementById('audio-player');
       player.src = url;
       container.style.display = 'block';
-      player.play();
+      setTimeout(() => {
+        player.play().catch((err) => {
+          console.log('Play failed:', err);
+        });
+      }, 100);
+
+      player.onended = () => {
+        btn.innerHTML = `<svg class="voice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Get Voice Briefing`;
+        btn.disabled = false;
+      };
+
     } catch (e) {
       alert('Could not generate voice briefing.');
+      btn.innerHTML = `<svg class="voice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Get Voice Briefing`;
+      btn.disabled = false;
     }
-
-    btn.innerHTML = `<svg class="voice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg> Get Voice Briefing`;
-    btn.disabled = false;
   }
 
   loadDashboard();
+  loadPlan();
 </script>
 
 </body>

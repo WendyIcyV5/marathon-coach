@@ -14,6 +14,17 @@ import json
 from services.gemini import analyze_run_and_adapt_plan
 from services.elevenlabs import generate_voice
 from fastapi.responses import FileResponse
+import re
+
+def extract_json(text: str) -> str:
+    text = text.strip()
+    text = re.sub(r'^```json\s*', '', text)
+    text = re.sub(r'^```\s*', '', text)
+    text = re.sub(r'\s*```$', '', text)
+    match = re.search(r'\{.*\}', text, re.DOTALL)
+    if match:
+        return match.group(0)
+    return text
 
 router = APIRouter(prefix="/coach", tags=["Coach"])
 
@@ -77,13 +88,7 @@ def analyze_and_adapt(user_id: int, db: Session = Depends(get_db)):
         user_data, logs_data, json.loads(current_plan.plan_json)
     )
 
-    clean_result = (
-        result_text.strip()
-        .removeprefix("```json")
-        .removeprefix("```")
-        .removesuffix("```")
-        .strip()
-    )
+    clean_result = extract_json(result_text)
     result = json.loads(clean_result)
 
     # save feedback to the run log
