@@ -27,10 +27,11 @@ class PastRaceInput(BaseModel):
             "example": {
                 "distance_km": 21.1,
                 "finish_time": "2:15:00",
-                "race_date": "2025-10-01"
+                "race_date": "2025-10-01",
             }
         }
     }
+
 
 class UserCreate(BaseModel):
     name: str
@@ -52,9 +53,9 @@ class UserCreate(BaseModel):
                     {
                         "distance_km": 21.1,
                         "finish_time": "2:15:00",
-                        "race_date": "2025-10-01"
+                        "race_date": "2025-10-01",
                     }
-                ]
+                ],
             }
         }
     }

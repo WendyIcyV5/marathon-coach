@@ -48,8 +48,42 @@ def generate_training_plan(user_data: dict) -> str:
 
     Only return the JSON, no extra text.
     """
+
+
+def analyze_run_and_adapt_plan(
+    user_data: dict, run_logs: list, current_plan: dict
+) -> str:
+    prompt = f"""
+    You are an expert marathon coach analyzing a runner's recent training.
+
+    Runner profile:
+    - Name: {user_data['name']}
+    - Race type: {user_data['race_type']}
+    - Race date: {user_data['marathon_date']}
+    - Goal time: {user_data['goal_time'] or 'not specified'}
+
+    Current training plan:
+    {current_plan}
+
+    Recent run logs:
+    {run_logs}
+
+    Based on the run logs, provide:
+    1. Feedback on recent performance
+    2. Whether the current plan needs adjusting
+    3. An updated plan if needed (same JSON structure as the current plan)
+
+    Return a JSON object with this structure:
+    {{
+        "feedback": "Personalized coaching feedback here",
+        "plan_changed": true or false,
+        "updated_plan": {{ same structure as current plan, or null if no changes needed }},
+        "predicted_finish_time": "updated prediction or same as before"
+    }}
+
+    Only return the JSON, no extra text.
+    """
     response = client.models.generate_content(
-        model="gemini-3-flash-preview",
-        contents=prompt
+        model="gemini-3-flash-preview", contents=prompt
     )
     return response.text

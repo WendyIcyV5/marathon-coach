@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine
 import models
-from routes import user, plan
+from routes import user, plan, runs, coach
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -25,6 +25,9 @@ app.add_middleware(
 
 app.include_router(user.router)
 app.include_router(plan.router)
+app.include_router(runs.router)
+app.include_router(coach.router)
+
 
 @app.get("/")
 def root():
