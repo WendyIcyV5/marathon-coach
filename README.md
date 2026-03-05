@@ -1,5 +1,6 @@
 # PaceIQ 🏃
 ### An AI running coach that listens, learns, and talks back.
+![Pace IQ](image/2026-03-01_112345.png)
 
 ## What it does
 PaceIQ generates a personalized marathon/half-marathon training plan and 
